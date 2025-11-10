@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Editor de Imágenes</title>
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+
+  <div id="app-container">
+
+    <div id="canvas-wrapper">
+      <canvas id="editor-canvas" width="500" height="500"></canvas>
+      <div id="empty-state">
+        <p>Haga clic derecho en cualquier imagen de la web y seleccione "Formatear Imagen de Producto..."</p>
+      </div>
+      <div id="error-state" class="hidden">
+        <p id="error-message"></p>
+      </div>
+    </div>
+
+    <div id="controls-area">
+
+      <div id="main-controls">
+        <div class="controls-group">
+          <div class="toggles">
+            <label><input type="checkbox" id="toggle-logo"> <span>Mostrar logo</span></label>
+            <label><input type="checkbox" id="toggle-frame"> <span>Marco</span></label>
+          </div>
+          <div class="buttons">
+            <button id="btn-rotate" title="Girar 90°">↻</button>
+            <button id="btn-flip-h" title="Voltear Horizontal">↔</button>
+            <button id="btn-flip-v" title="Voltear Vertical">↕</button>
+            <button id="btn-reset-transform" title="Resetear Encuadre">↺</button>
+          </div>
+        </div>
+        <div class="controls-group actions">
+          <select id="select-format">
+            <option value="image/png">PNG</option>
+            <option value="image/jpeg">JPEG</option>
+            <option value="image/webp">WEBP</option>
+          </select>
+          <button id="btn-download" class="primary" disabled>Descargar</button>
+          <button id="btn-go-settings" title="Ajustes">🛠</button>
+        </div>
+      </div>
+
+      <div id="settings-controls" class="hidden">
+        
+        <div class="settings-scroll-area">
+          
+          <div class="collapsible-section">
+            <button class="collapsible-header active">
+              <span>🎨 Ajustes de Logo</span>
+              <span class="chevron">▼</span> 
+            </button>
+            <div class="collapsible-content expanded">
+              <div class="settings-group">
+                <div class="setting-item" id="logo-toggle-row">
+                  <label for="toggle-logo-settings">Mostrar Logo</label>
+                  <input type="checkbox" id="toggle-logo-settings">
+                  <label for="logo-position" id="logo-position-label">Posición</label>
+                  <select id="logo-position">
+                    <option value="top-left">Sup. Izquierda</option>
+                    <option value="top-right">Sup. Derecha</option>
+                    <option value="bottom-left">Inf. Izquierda</option>
+                    <option value="bottom-right">Inf. Derecha</option>
+                    <option value="center">Centro</option>
+                  </select>
+                </div>
+                <div class="setting-item">
+                  <label for="logo-opacity">Opacidad: <span id="logo-opacity-val"></span></label>
+                  <input type="range" id="logo-opacity" min="0" max="1" step="0.05" list="opacity-ticks">
+                  <datalist id="opacity-ticks">
+                    <option value="0" label="0%"></option>
+                    <option value="0.5" label="50%"></option>
+                    <option value="1" label="100%"></option>
+                  </datalist>
+                </div>
+                <div class="setting-item">
+                  <label for="logo-size">Tamaño: <span id="logo-size-val"></span>%</label>
+                  <input type="range" id="logo-size" min="0.05" max="1" step="0.05" list="size-ticks">
+                  <datalist id="size-ticks">
+                    <option value="0.05" label="5%"></option>
+                    <option value="0.25" label="25%"></option>
+                    <option value="0.5" label="50%"></option>
+                    <option value="0.75" label="75%"></option>
+                    <option value="1" label="100%"></option>
+                  </datalist>
+                </div>
+                <div class="setting-item">
+                  <label for="logo-rotation">Rotación: <span id="logo-rotation-val"></span>°</label>
+                  <input type="range" id="logo-rotation" min="-90" max="90" step="5" list="rotation-ticks">
+                  <datalist id="rotation-ticks">
+                    <option value="-90" label="-90°"></option>
+                    <option value="-45" label="-45°"></option>
+                    <option value="0" label="0°"></option>
+                    <option value="45" label="45°"></option>
+                    <option value="90" label="90°"></option>
+                  </datalist>
+                </div>
+                <div class="setting-item" id="logo-upload-area">
+                  <div class="logo-header">
+                    <img id="logo-preview" src="" alt="Vista previa logo">
+                  </div>
+                  <div class="logo-input-group">
+                    <input type="file" id="logo-upload" accept="image/png, image/svg+xml">
+                    <button id="logo-restore-default">❌</button>
+                  </div>
+                </div>
+              </div> </div> </div> <div class="collapsible-section">
+            <button class="collapsible-header">
+              <span>🖼️ Ajustes de Marco</span>
+              <span class="chevron">▼</span> 
+            </button>
+            <div class="collapsible-content">
+              <div class="settings-group">
+                <div class="setting-item" id="frame-toggle-row">
+                  <label for="toggle-frame-settings">Mostrar Marco</label>
+                  <input type="checkbox" id="toggle-frame-settings">
+                </div>
+                
+                <div class="setting-item" id="frame-type-row">
+                  <label for="frame-type">Tipo</label>
+                  <select id="frame-type">
+                    <option value="simple">Sencillo</option>
+                    <option value="double">Doble</option>
+                    <option value="shadow">Sombra Interior</option>
+                    <option value="vignette">Viñeta</option>
+                  </select>
+                </div>
+                
+                <div class="setting-item hidden" id="frame-color-simple-row">
+                  <label for="frame-color-simple">Color</label>
+                  <input type="color" id="frame-color-simple">
+                </div>
+                <div class="setting-item hidden" id="frame-size-simple-row">
+                  <label for="frame-size-simple">Grosor: <span id="frame-size-simple-val"></span></label>
+                  <input type="range" id="frame-size-simple" min="1" max="40" step="1">
+                </div>
+                
+                <div class="setting-item hidden" id="frame-color-double-outer-row">
+                  <label for="frame-color-double-outer">C. Exterior</label>
+                  <input type="color" id="frame-color-double-outer">
+                </div>
+                <div class="setting-item hidden" id="frame-size-double-outer-row">
+                  <label for="frame-size-double-outer">G. Exterior: <span id="frame-size-double-outer-val"></span></label>
+                  <input type="range" id="frame-size-double-outer" min="1" max="40" step="1">
+                </div>
+                <div class="setting-item hidden" id="frame-color-double-inner-row">
+                  <label for="frame-color-double-inner">C. Interior</label>
+                  <input type="color" id="frame-color-double-inner">
+                </div>
+                <div class="setting-item hidden" id="frame-size-double-inner-row">
+                  <label for="frame-size-double-inner">G. Interior: <span id="frame-size-double-inner-val"></span></label>
+                  <input type="range" id="frame-size-double-inner" min="1" max="40" step="1">
+                </div>
+                <div class="setting-item hidden" id="frame-size-double-sep-row">
+                  <label for="frame-size-double-sep">Separación: <span id="frame-size-double-sep-val"></span></label>
+                  <input type="range" id="frame-size-double-sep" min="5" max="20" step="1">
+                </div>
+                
+                <div class="setting-item hidden" id="frame-color-shadow-row">
+                  <label for="frame-color-shadow">Color Sombra</label>
+                  <input type="color" id="frame-color-shadow">
+                </div>
+                <div class="setting-item hidden" id="frame-shadow-blur-row">
+                  <label for="frame-shadow-blur">Desenfoque: <span id="frame-shadow-blur-val"></span></label>
+                  <input type="range" id="frame-shadow-blur" min="1" max="50" step="1">
+                </div>
+                <div class="setting-item hidden" id="frame-shadow-distance-row">
+                  <label for="frame-shadow-distance">Distancia: <span id="frame-shadow-distance-val"></span></label>
+                  <input type="range" id="frame-shadow-distance" min="1" max="50" step="1">
+                </div>
+                
+                <div class="setting-item hidden" id="frame-color-vignette-row">
+                  <label for="frame-color-vignette">Color</label>
+                  <input type="color" id="frame-color-vignette">
+                </div>
+                 <div class="setting-item hidden" id="frame-vignette-intensity-row">
+                  <label for="frame-vignette-intensity">Intensidad: <span id="frame-vignette-intensity-val"></span></label>
+                  <input type="range" id="frame-vignette-intensity" min="0.1" max="1" step="0.05">
+                </div>
+
+                <div class="setting-item hidden" id="frame-corner-radius-row">
+                  <label for="frame-corner-radius">Redondeado: <span id="frame-corner-radius-val"></span></label>
+                  <input type="range" id="frame-corner-radius" min="0" max="50" step="1">
+                </div>
+                
+              </div> </div> </div> </div> <div class="settings-group" id="settings-actions">
+          <button id="btn-reset-all-settings" class="danger">Restablecer</button>
+          <button id="btn-back-main" class="primary">Guardar</button>
+        </div>
+
+      </div> </div> </div> <script src="main.js" type="module"></script>
+</body>
+</html>
