@@ -1,0 +1,7 @@
+# Archivo de la extensión empaquetada (nunca subir al repo)
+*.zip
+*.crx
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
