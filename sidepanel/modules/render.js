@@ -1,7 +1,7 @@
 // sidepanel/modules/render.js
 
 import * as dom from './dom.js';
-import { state } from './state.js';
+import { state } from './state.js'; // <-- CORREGIDO
 import { logoImage } from './image.js';
 
 let isRenderScheduled = false;
@@ -50,7 +50,6 @@ export function renderCanvas() {
 
 /**
  * Helper para crear un path de rectángulo redondeado.
- * No dibuja, solo crea el path para que 'clip', 'stroke' o 'fill' puedan usarlo.
  */
 function createRoundedRectPath(ctx, x, y, width, height, radius) {
   if (width < 2 * radius) radius = width / 2;
@@ -99,24 +98,19 @@ export function drawFrame(frame) {
     dom.ctx.stroke();
 
   } else if (type === 'shadow') {
-    // TÉCNICA DE SOMBRA INTERIOR
-    // 1. Dibuja la "ventana" (el rectángulo redondeado)
+    // Sombra INTERIOR
     createRoundedRectPath(dom.ctx, 0, 0, w, h, cornerRadius);
-    // 2. Córtalo del canvas
     dom.ctx.clip();
-    // 3. Configura la sombra
     dom.ctx.shadowColor = colorShadow;
     dom.ctx.shadowBlur = shadowBlur;
     dom.ctx.shadowOffsetX = shadowDistance;
     dom.ctx.shadowOffsetY = shadowDistance;
-    // 4. Dibuja un "agujero" inverso
-    // Esto dibuja en todas partes EXCEPTO en el agujero,
-    // proyectando la sombra HACIA ADENTRO.
+    // Dibuja un "agujero" inverso para proyectar la sombra hacia adentro
     dom.ctx.beginPath();
-    dom.ctx.rect(0, 0, w, h); // Rect interior
-    dom.ctx.rect(-w, -h, w * 3, h * 3); // Rect exterior gigante
-    dom.ctx.fillStyle = "black"; // El color no importa
-    dom.ctx.fill("evenodd"); // ¡Magia!
+    dom.ctx.rect(0, 0, w, h); 
+    dom.ctx.rect(-w, -h, w * 3, h * 3); 
+    dom.ctx.fillStyle = "black";
+    dom.ctx.fill("evenodd");
 
   } else if (type === 'vignette') {
     const gradient = dom.ctx.createRadialGradient(w / 2, h / 2, w * (0.5 - vignetteIntensity / 2), w / 2, h / 2, w / 2);
@@ -134,13 +128,18 @@ export function drawFrame(frame) {
 
 export function drawLogo(logo) {
   const { opacity, size, position, rotation } = logo;
+  
   const cw = dom.canvas.width;
   const ch = dom.canvas.height;
+  
   const LOGO_MARGIN = 15; 
+                 
   const safeWidth = cw - (LOGO_MARGIN * 2);
   const safeHeight = ch - (LOGO_MARGIN * 2);
+
   let baseWidth, baseHeight;
   const logoAspectRatio = logoImage.width / logoImage.height;
+
   if (logoAspectRatio >= 1) { 
     baseWidth = safeWidth;
     baseHeight = baseWidth / logoAspectRatio;
@@ -148,13 +147,16 @@ export function drawLogo(logo) {
     baseHeight = safeHeight;
     baseWidth = baseHeight * logoAspectRatio;
   }
+  
   const logoWidth = baseWidth * size;
   const logoHeight = baseHeight * size;
+
   const rad = rotation * Math.PI / 180;
   const sin = Math.abs(Math.sin(rad));
   const cos = Math.abs(Math.cos(rad));
   const rotatedWidth = logoWidth * cos + logoHeight * sin;
   const rotatedHeight = logoWidth * sin + logoHeight * cos;
+
   let cx, cy; 
   switch (position) {
     case 'top-left':
@@ -178,6 +180,7 @@ export function drawLogo(logo) {
       cx = cw - LOGO_MARGIN - (rotatedWidth / 2);
       cy = ch - LOGO_MARGIN - (rotatedHeight / 2);
   }
+
   dom.ctx.save();
   dom.ctx.globalAlpha = opacity;
   dom.ctx.translate(cx, cy);

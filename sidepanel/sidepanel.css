@@ -410,7 +410,6 @@ hr.settings-divider {
     transition: max-height 0.3s ease-out;
 }
 
-/* CORREGIDO EL ERROR DE SINTAXIS (faltaba '.') */
 .collapsible-content.expanded {
     max-height: 500px;
     transition: max-height 0.3s ease-in;
